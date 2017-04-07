@@ -1,12 +1,13 @@
 package main
 
 import (
-	"bitbucket.org/liamstask/goose/lib/goose"
 	"database/sql"
 	"fmt"
 	"log"
 	"path/filepath"
 	"time"
+
+	"bitbucket.org/liamstask/goose/lib/goose"
 )
 
 var statusCmd = &Command{
@@ -29,19 +30,21 @@ func statusRun(cmd *Command, args ...string) {
 		log.Fatal(err)
 	}
 
-	// collect all migrations
-	min := int64(0)
-	max := int64((1 << 63) - 1)
-	migrations, e := goose.CollectMigrations(conf.MigrationsDir, min, max)
+	db, err := goose.OpenDBFromDBConf(conf)
+	if err != nil {
+		log.Fatal("couldn't open DB:", err)
+	}
+	defer db.Close()
+
+	applied, err := goose.AppliedDBVersions(conf, db)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	migrations, e := goose.CollectMigrations(conf.MigrationsDir, true, applied)
 	if e != nil {
 		log.Fatal(e)
 	}
-
-	db, e := goose.OpenDBFromDBConf(conf)
-	if e != nil {
-		log.Fatal("couldn't open DB:", e)
-	}
-	defer db.Close()
 
 	// must ensure that the version table exists if we're running on a pristine DB
 	if _, e := goose.EnsureDBVersion(conf, db); e != nil {

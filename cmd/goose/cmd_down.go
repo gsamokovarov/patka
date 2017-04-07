@@ -1,8 +1,9 @@
 package main
 
 import (
-	"bitbucket.org/liamstask/goose/lib/goose"
 	"log"
+
+	"bitbucket.org/liamstask/goose/lib/goose"
 )
 
 var downCmd = &Command{
@@ -20,17 +21,18 @@ func downRun(cmd *Command, args ...string) {
 		log.Fatal(err)
 	}
 
-	current, err := goose.GetDBVersion(conf)
+	db, err := goose.OpenDBFromDBConf(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	applied, err := goose.AppliedDBVersions(conf, db)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	previous, err := goose.GetPreviousDBVersion(conf.MigrationsDir, current)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if err = goose.RunMigrations(conf, conf.MigrationsDir, previous); err != nil {
+	if err = goose.RunMigrations(conf, conf.MigrationsDir, false, applied); err != nil {
 		log.Fatal(err)
 	}
 }
