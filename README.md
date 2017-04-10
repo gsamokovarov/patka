@@ -3,7 +3,7 @@
 **Patka** is a fork of [goose] that applies unapplied migrations, even if they
 happen to be in the past.
 
-_(Note that the executable and event the magic comments are renamed to patka.)_
+_(Note that the executable and even the magic comments are renamed to patka.)_
 
 **Install**
 
