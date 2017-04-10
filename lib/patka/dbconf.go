@@ -1,4 +1,4 @@
-package goose
+package patka
 
 import (
 	"database/sql"

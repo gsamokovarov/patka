@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bitbucket.org/liamstask/goose/lib/goose"
+	"github.com/gsamokovarov/patka/lib/patka"
 	"flag"
 	"fmt"
 	"os"
@@ -15,8 +15,8 @@ var flagEnv = flag.String("env", "development", "which DB environment to use")
 var flagPgSchema = flag.String("pgschema", "", "which postgres-schema to migrate (default = none)")
 
 // helper to create a DBConf from the given flags
-func dbConfFromFlags() (dbconf *goose.DBConf, err error) {
-	return goose.NewDBConf(*flagPath, *flagEnv, *flagPgSchema)
+func dbConfFromFlags() (dbconf *patka.DBConf, err error) {
+	return patka.NewDBConf(*flagPath, *flagEnv, *flagPgSchema)
 }
 
 var commands = []*Command{
@@ -64,10 +64,10 @@ func usage() {
 }
 
 var usagePrefix = `
-goose is a database migration management system for Go projects.
+patka is a database migration management system for Go projects.
 
 Usage:
-    goose [options] <subcommand> [subcommand options]
+    patka [options] <subcommand> [subcommand options]
 
 Options:
 `

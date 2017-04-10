@@ -1,4 +1,4 @@
-package goose
+package patka
 
 import (
 	"bytes"
@@ -37,7 +37,7 @@ func init() {
 func runGoMigration(conf *DBConf, path string, version int64, direction bool) error {
 
 	// everything gets written to a temp dir, and zapped afterwards
-	d, e := ioutil.TempDir("", "goose")
+	d, e := ioutil.TempDir("", "patka")
 	if e != nil {
 		log.Fatal(e)
 	}
@@ -71,7 +71,7 @@ func runGoMigration(conf *DBConf, path string, version int64, direction bool) er
 		Func:       fmt.Sprintf("%v_%v", directionStr, version),
 		InsertStmt: conf.Driver.Dialect.insertVersionSql(),
 	}
-	main, e := writeTemplateToFile(filepath.Join(d, "goose_main.go"), goMigrationDriverTemplate, td)
+	main, e := writeTemplateToFile(filepath.Join(d, "patka_main.go"), goMigrationDriverTemplate, td)
 	if e != nil {
 		log.Fatal(e)
 	}
@@ -96,7 +96,7 @@ func runGoMigration(conf *DBConf, path string, version int64, direction bool) er
 // this gets linked against the substituted versions of the user-supplied
 // scripts in order to execute a migration via `go run`
 //
-var goMigrationDriverTemplate = template.Must(template.New("goose.go-driver").Parse(`
+var goMigrationDriverTemplate = template.Must(template.New("patka.go-driver").Parse(`
 package main
 
 import (
@@ -105,18 +105,18 @@ import (
 	"encoding/gob"
 
 	_ "{{.Import}}"
-	"bitbucket.org/liamstask/goose/lib/goose"
+	"github.com/gsamokovarov/patka/lib/patka"
 )
 
 func main() {
 
-	var conf goose.DBConf
+	var conf patka.DBConf
 	buf := bytes.NewBuffer({{ .Conf }})
 	if err := gob.NewDecoder(buf).Decode(&conf); err != nil {
 		log.Fatal("gob.Decode - ", err)
 	}
 
-	db, err := goose.OpenDBFromDBConf(&conf)
+	db, err := patka.OpenDBFromDBConf(&conf)
 	if err != nil {
 		log.Fatal("failed to open DB:", err)
 	}
@@ -129,7 +129,7 @@ func main() {
 
 	{{ .Func }}(txn)
 
-	err = goose.FinalizeMigration(&conf, txn, {{ .Direction }}, {{ .Version }})
+	err = patka.FinalizeMigration(&conf, txn, {{ .Direction }}, {{ .Version }})
 	if err != nil {
 		log.Fatal("Commit() failed:", err)
 	}

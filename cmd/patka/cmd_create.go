@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bitbucket.org/liamstask/goose/lib/goose"
+	"github.com/gsamokovarov/patka/lib/patka"
 	"fmt"
 	"log"
 	"os"
@@ -20,7 +20,7 @@ var createCmd = &Command{
 func createRun(cmd *Command, args ...string) {
 
 	if len(args) < 1 {
-		log.Fatal("goose create: migration name required")
+		log.Fatal("patka create: migration name required")
 	}
 
 	migrationType := "go" // default to Go migrations
@@ -37,7 +37,7 @@ func createRun(cmd *Command, args ...string) {
 		log.Fatal(err)
 	}
 
-	n, err := goose.CreateMigration(args[0], migrationType, conf.MigrationsDir, time.Now())
+	n, err := patka.CreateMigration(args[0], migrationType, conf.MigrationsDir, time.Now())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,5 +47,5 @@ func createRun(cmd *Command, args ...string) {
 		log.Fatal(e)
 	}
 
-	fmt.Println("goose: created", a)
+	fmt.Println("patka: created", a)
 }

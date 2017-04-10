@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"bitbucket.org/liamstask/goose/lib/goose"
+	"github.com/gsamokovarov/patka/lib/patka"
 )
 
 var redoCmd = &Command{
@@ -20,27 +20,27 @@ func redoRun(cmd *Command, args ...string) {
 		log.Fatal(err)
 	}
 
-	db, err := goose.OpenDBFromDBConf(conf)
+	db, err := patka.OpenDBFromDBConf(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	appliedBeforeDown, err := goose.AppliedDBVersions(conf, db)
+	appliedBeforeDown, err := patka.AppliedDBVersions(conf, db)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := goose.RunMigrations(conf, conf.MigrationsDir, false, appliedBeforeDown); err != nil {
+	if err := patka.RunMigrations(conf, conf.MigrationsDir, false, appliedBeforeDown); err != nil {
 		log.Fatal(err)
 	}
 
-	appliedAfterDown, err := goose.AppliedDBVersions(conf, db)
+	appliedAfterDown, err := patka.AppliedDBVersions(conf, db)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := goose.RunMigrations(conf, conf.MigrationsDir, true, appliedAfterDown); err != nil {
+	if err := patka.RunMigrations(conf, conf.MigrationsDir, true, appliedAfterDown); err != nil {
 		log.Fatal(err)
 	}
 }

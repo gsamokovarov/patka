@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bitbucket.org/liamstask/goose/lib/goose"
+	"github.com/gsamokovarov/patka/lib/patka"
 	"fmt"
 	"log"
 )
@@ -20,10 +20,10 @@ func dbVersionRun(cmd *Command, args ...string) {
 		log.Fatal(err)
 	}
 
-	current, err := goose.GetDBVersion(conf)
+	current, err := patka.GetDBVersion(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("goose: dbversion %v\n", current)
+	fmt.Printf("patka: dbversion %v\n", current)
 }

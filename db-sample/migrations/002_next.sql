@@ -1,5 +1,5 @@
 
--- +goose Up
+-- +patka Up
 CREATE TABLE fancier_post (
     id int NOT NULL,
     title text,
@@ -8,5 +8,5 @@ CREATE TABLE fancier_post (
     PRIMARY KEY(id)
 );
 
--- +goose Down
+-- +patka Down
 DROP TABLE fancier_post;

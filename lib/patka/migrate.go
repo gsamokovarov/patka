@@ -1,4 +1,4 @@
-package goose
+package patka
 
 import (
 	"database/sql"
@@ -71,14 +71,14 @@ func RunMigrationsOnDb(conf *DBConf, migrationsDir string, direction bool, appli
 	current := currentAppliedDBVersion(applied)
 
 	if len(migrations) == 0 {
-		fmt.Printf("goose: no migrations to run. current version: %d\n", current)
+		fmt.Printf("patka: no migrations to run. current version: %d\n", current)
 		return nil
 	}
 
 	ms := migrationSorter(migrations)
 	ms.Sort(direction)
 
-	fmt.Printf("goose: migrating db environment '%v', current version: %d\n",
+	fmt.Printf("patka: migrating db environment '%v', current version: %d\n",
 		conf.Env, current)
 
 	for _, m := range ms {
@@ -283,7 +283,7 @@ func EnsureDBVersion(conf *DBConf, db *sql.DB) (int64, error) {
 	panic("failure in EnsureDBVersion()")
 }
 
-// Create the goose_db_version table
+// Create the patka_db_version table
 // and insert the initial 0 value into it
 func createVersionTable(conf *DBConf, db *sql.DB) error {
 	txn, err := db.Begin()
@@ -417,7 +417,7 @@ func CreateMigration(name, migrationType, dir string, t time.Time) (path string,
 // and finalize the transaction.
 func FinalizeMigration(conf *DBConf, txn *sql.Tx, direction bool, v int64) error {
 
-	// XXX: drop goose_db_version table on some minimum version number?
+	// XXX: drop patka_db_version table on some minimum version number?
 	stmt := conf.Driver.Dialect.insertVersionSql()
 	if _, err := txn.Exec(stmt, v, direction); err != nil {
 		txn.Rollback()
@@ -427,7 +427,7 @@ func FinalizeMigration(conf *DBConf, txn *sql.Tx, direction bool, v int64) error
 	return txn.Commit()
 }
 
-var goMigrationTemplate = template.Must(template.New("goose.go-migration").Parse(`
+var goMigrationTemplate = template.Must(template.New("patka.go-migration").Parse(`
 package main
 
 import (
@@ -445,12 +445,12 @@ func Down_{{ . }}(txn *sql.Tx) {
 }
 `))
 
-var sqlMigrationTemplate = template.Must(template.New("goose.sql-migration").Parse(`
--- +goose Up
+var sqlMigrationTemplate = template.Must(template.New("patka.sql-migration").Parse(`
+-- +patka Up
 -- SQL in section 'Up' is executed when this migration is applied
 
 
--- +goose Down
+-- +patka Down
 -- SQL section 'Down' is executed when this migration is rolled back
 
 `))

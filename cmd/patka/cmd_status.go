@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"bitbucket.org/liamstask/goose/lib/goose"
+	"github.com/gsamokovarov/patka/lib/patka"
 )
 
 var statusCmd = &Command{
@@ -30,28 +30,28 @@ func statusRun(cmd *Command, args ...string) {
 		log.Fatal(err)
 	}
 
-	db, err := goose.OpenDBFromDBConf(conf)
+	db, err := patka.OpenDBFromDBConf(conf)
 	if err != nil {
 		log.Fatal("couldn't open DB:", err)
 	}
 	defer db.Close()
 
-	applied, err := goose.AppliedDBVersions(conf, db)
+	applied, err := patka.AppliedDBVersions(conf, db)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	migrations, e := goose.CollectMigrations(conf.MigrationsDir, true, applied)
+	migrations, e := patka.CollectMigrations(conf.MigrationsDir, true, applied)
 	if e != nil {
 		log.Fatal(e)
 	}
 
 	// must ensure that the version table exists if we're running on a pristine DB
-	if _, e := goose.EnsureDBVersion(conf, db); e != nil {
+	if _, e := patka.EnsureDBVersion(conf, db); e != nil {
 		log.Fatal(e)
 	}
 
-	fmt.Printf("goose: status for environment '%v'\n", conf.Env)
+	fmt.Printf("patka: status for environment '%v'\n", conf.Env)
 	fmt.Println("    Applied At                  Migration")
 	fmt.Println("    =======================================")
 	for _, m := range migrations {
@@ -60,8 +60,8 @@ func statusRun(cmd *Command, args ...string) {
 }
 
 func printMigrationStatus(db *sql.DB, version int64, script string) {
-	var row goose.MigrationRecord
-	q := fmt.Sprintf("SELECT tstamp, is_applied FROM goose_db_version WHERE version_id=%d ORDER BY tstamp DESC LIMIT 1", version)
+	var row patka.MigrationRecord
+	q := fmt.Sprintf("SELECT tstamp, is_applied FROM patka_db_version WHERE version_id=%d ORDER BY tstamp DESC LIMIT 1", version)
 	e := db.QueryRow(q).Scan(&row.TStamp, &row.IsApplied)
 
 	if e != nil && e != sql.ErrNoRows {

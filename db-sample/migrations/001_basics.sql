@@ -1,5 +1,5 @@
 
--- +goose Up
+-- +patka Up
 CREATE TABLE post (
     id int NOT NULL,
     title text,
@@ -7,5 +7,5 @@ CREATE TABLE post (
     PRIMARY KEY(id)
 );
 
--- +goose Down
+-- +patka Down
 DROP TABLE post;
